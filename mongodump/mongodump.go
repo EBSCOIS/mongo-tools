@@ -568,6 +568,12 @@ func (dump *MongoDump) DumpIntent(intent *intents.Intent, buffer resettableOutpu
 	}
 
 	findQuery := &db.DeferredQuery{Coll: coll}
+	if dump.InputOptions.BatchSize > 0 {
+		findQuery.BatchSize = dump.InputOptions.BatchSize
+	} else {
+		findQuery.BatchSize = 1000
+	}
+
 	switch {
 	case len(dump.query) > 0:
 		if intent.IsTimeseries() {

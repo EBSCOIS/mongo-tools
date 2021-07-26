@@ -12,6 +12,7 @@ type DeferredQuery struct {
 	Filter    interface{}
 	Hint      interface{}
 	LogReplay bool
+	BatchSize int32
 }
 
 // Count issues a EstimatedDocumentCount command when there is no Filter in the query and a CountDocuments command otherwise.
@@ -42,6 +43,7 @@ func (q *DeferredQuery) Count(isView bool) (int, error) {
 // Iter executes a find query and returns a cursor.
 func (q *DeferredQuery) Iter() (*mongo.Cursor, error) {
 	opts := mopt.Find()
+	opts.SetBatchSize(q.BatchSize)
 	if q.Hint != nil {
 		opts.SetHint(q.Hint)
 	}
