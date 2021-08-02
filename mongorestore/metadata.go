@@ -169,6 +169,17 @@ func (restore *MongoRestore) CreateIndexes(dbName string, collectionName string,
 		}
 		indexNames = append(indexNames, index.Options["name"].(string))
 
+		// default is to build indexes in the background
+		// unless we specifically want to follow the dump metadata
+		if !restore.OutputOptions.AllowForegroundIndexBuild {
+			index.Options["background"] = true
+		}
+
+		// specifically force all indexes to be built in foreground
+		if restore.OutputOptions.ForceForegroundIndexBuild {
+			delete(index.Options, "background")
+		}
+
 		// remove the index version, forcing an update,
 		// unless we specifically want to keep it
 		if !restore.OutputOptions.KeepIndexVersion {
